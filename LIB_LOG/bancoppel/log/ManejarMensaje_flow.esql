@@ -1,0 +1,53 @@
+BROKER SCHEMA bancoppel.log
+
+CREATE COMPUTE MODULE ManejarMensaje_transformarMensaje
+	DECLARE SERVICIO EXTERNAL CHARACTER;
+	DECLARE log NAMESPACE 'http://www.bancoppel.com/Logger';
+	
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		
+		-- Propagar la respuesta al MQOutput
+		
+		SET OutputRoot.XMLNSC.log:Log.trace.idTrxGlobal = nvlTrim(Environment.trace.idTrxGlobal, '-');
+		SET OutputRoot.XMLNSC.log:Log.trace.sistemaOrigen = nvlTrim(Environment.trace.sistemaOrigen, '-');
+		SET OutputRoot.XMLNSC.log:Log.trace.referencia = nvlTrim(Environment.operacion, '-') || '_' || CAST(CURRENT_TIMESTAMP AS CHARACTER FORMAT 'yyyyMMdd_HHmmss');
+		SET OutputRoot.XMLNSC.log:Log.trace.servicio = SERVICIO;
+		SET OutputRoot.XMLNSC.log:Log.trace.trama = nvlTrim(Environment.trace.trama, '-');
+		SET OutputRoot.XMLNSC.log:Log.trace.estatus = nvlTrim(Environment.trace.estatus, 'success');
+		
+		PROPAGATE TO TERMINAL 'out1';
+		
+		-- Propagar todo el mensaje al SOAPReply
+		
+		SET OutputRoot = InputRoot;
+		
+		RETURN TRUE;
+	END;
+END MODULE;
+
+CREATE COMPUTE MODULE ManejarMensaje_transformarJSON
+	DECLARE SERVICIO EXTERNAL CHARACTER;
+	DECLARE log NAMESPACE 'http://www.bancoppel.com/Logger';
+	
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		
+		-- Propagar la respuesta al MQOutput
+		
+		SET OutputRoot.XMLNSC.log:Log.trace.idTrxGlobal = nvlTrim(Environment.trace.idTrxGlobal, '-');
+		SET OutputRoot.XMLNSC.log:Log.trace.sistemaOrigen = nvlTrim(Environment.trace.sistemaOrigen, '-');
+		SET OutputRoot.XMLNSC.log:Log.trace.referencia = nvlTrim(Environment.operacion, '-') || '_' || CAST(CURRENT_TIMESTAMP AS CHARACTER FORMAT 'yyyyMMdd_HHmmss');
+		SET OutputRoot.XMLNSC.log:Log.trace.servicio = SERVICIO;
+		SET OutputRoot.XMLNSC.log:Log.trace.trama = nvlTrim(Environment.trace.trama, '-');
+		SET OutputRoot.XMLNSC.log:Log.trace.estatus = nvlTrim(Environment.trace.estatus, 'success');
+		
+		PROPAGATE TO TERMINAL 'out1';
+		
+		-- Propagar todo el mensaje al HTTPReply
+		
+		SET OutputRoot = InputRoot;
+		
+		RETURN TRUE;
+	END;
+END MODULE;

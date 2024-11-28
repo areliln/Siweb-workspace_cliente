@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.bancoppel.com/Logger" xmlns:log="http://www.bancoppel.com/Logger">
+    <xsd:complexType name="TraceType">
+    	<xsd:sequence>
+    		<xsd:element name="idTrxGlobal" type="xsd:string" minOccurs="1" maxOccurs="1" />
+    		<xsd:element name="sistemaOrigen" type="xsd:string" minOccurs="1" maxOccurs="1" />
+    		<xsd:element name="servicio" type="xsd:string" minOccurs="1" maxOccurs="1" />
+    		<xsd:element name="referencia" type="xsd:string" minOccurs="1" maxOccurs="1" />
+    		<xsd:element name="trama" type="xsd:string" minOccurs="1" maxOccurs="1" />
+    		<xsd:element name="estatus" minOccurs="1" maxOccurs="1">
+    			<xsd:simpleType>
+    				<xsd:restriction base="xsd:string">
+    					<xsd:enumeration value="success"></xsd:enumeration>
+    					<xsd:enumeration value="error"></xsd:enumeration>
+    				</xsd:restriction>
+    			</xsd:simpleType>
+    		</xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+    
+    <xsd:complexType name="ErrorType">
+    	<xsd:sequence>
+    		<xsd:element name="codigo" type="xsd:string" minOccurs="1" maxOccurs="1" />
+    		<xsd:element name="descripcion" type="xsd:string" minOccurs="1" maxOccurs="1" />
+    		<xsd:element name="detalleTecnico" type="xsd:string" minOccurs="1" maxOccurs="1" />
+    	</xsd:sequence>
+    </xsd:complexType>
+    
+    <xsd:complexType name="LogType">
+    	<xsd:sequence>
+            <xsd:element name="trace" type="log:TraceType" minOccurs="0" maxOccurs="1" />
+    		<xsd:element name="error" type="log:ErrorType" minOccurs="0" maxOccurs="1" />
+    	</xsd:sequence>
+    </xsd:complexType>
+    
+    <xsd:element name="Log" type="log:LogType" />
+
+    <xsd:element name="Error" type="log:ErrorType" />
+</xsd:schema>

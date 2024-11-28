@@ -1,0 +1,120 @@
+BROKER SCHEMA bancoppel.log
+
+--DECLARE INSTANCIA CONSTANT CHARACTER 'DB2INST1'; -- DESARROLLO Y QA
+DECLARE INSTANCIA CONSTANT CHARACTER 'DB_ESB'; -- PRODUCCION
+DECLARE DESCRIPCION_ERROR_DEFAULT CONSTANT CHARACTER 'Ocurrió un error en el servicio.';
+
+CREATE PROCEDURE guardarTraceBD(IN container REFERENCE)
+BEGIN
+	DECLARE sql CHARACTER 'INSERT INTO ' || INSTANCIA || '.LOG_GENERICO(ID_LOG, ID_TRX_GLOBAL, TXN_REFERENCIA, TXN_SERVICIO, TXN_ESTATUS, SISTEMA_ORIGEN, REQUEST_DATETIME) VALUES(?, ?, ?, ?, ?, ?, ?);';
+	PASSTHRU(
+		sql,
+		container.idLog,
+		container.trace.idTrxGlobal,
+		container.trace.referencia,
+		container.trace.servicio,
+		container.trace.estatus,
+		container.trace.sistemaOrigen,
+		CURRENT_TIMESTAMP
+	);
+END;
+
+CREATE PROCEDURE guardarErrorBD(IN container REFERENCE)
+BEGIN
+	DECLARE sql CHARACTER 'INSERT INTO ' || INSTANCIA || '.LOG_ERROR(ID_LOG, ERROR_CODIGO, ERROR_DESC, ERROR_TEC) VALUES(?, ?, ?, ?);';
+	PASSTHRU(
+		sql,
+		container.idLog,
+		container.error.codigo, 
+		container.error.descripcion, 
+		container.error.detalleTecnico
+	);
+END;
+
+CREATE PROCEDURE guardarTrxBD(IN container REFERENCE)
+BEGIN
+--	DECLARE sql CHARACTER 'INSERT INTO ' || INSTANCIA || '.LOG_TRX(ID_TRX, ID_TRX_GLOBAL, TRAMA_EJEC, FECHORA_SYS) VALUES(?, ?, ?, ?);';
+--	PASSTHRU(
+--		sql,
+--		container.idTrx,
+--		container.trace.idTrxGlobal, 
+--		container.trace.trama, 
+--		CURRENT_TIMESTAMP
+--	);
+	
+	INSERT INTO Database.{INSTANCIA}.LOG_TRX(ID_TRX, ID_TRX_GLOBAL, TRAMA_EJEC, FECHORA_SYS) VALUES(container.idTrx, container.trace.idTrxGlobal, container.trace.trama, CURRENT_TIMESTAMP);
+END;
+
+CREATE FUNCTION consultarIdLog() RETURNS INTEGER
+BEGIN
+	DECLARE sql CHARACTER 'SELECT NVL(MAX(ID_LOG) + 1, 1) AS ID FROM ' || INSTANCIA || '.LOG_GENERICO';
+	DECLARE consulta ROW;
+	SET consulta.datos[] = PASSTHRU(
+		sql
+	);
+	RETURN CAST(consulta.datos.ID AS INTEGER);
+END;
+
+CREATE FUNCTION consultarIdTrx() RETURNS INTEGER
+BEGIN
+	DECLARE sql CHARACTER 'SELECT NVL(MAX(ID_TRX) + 1, 1) AS ID FROM ' || INSTANCIA || '.LOG_TRX';
+	DECLARE consulta ROW;
+	SET consulta.datos[] = PASSTHRU(
+		sql
+	);
+	RETURN CAST(consulta.datos.ID AS INTEGER);
+END;
+
+CREATE FUNCTION construirTramaWS(IN url CHARACTER, IN xml REFERENCE) RETURNS CHARACTER
+BEGIN
+	DECLARE trama CHARACTER url || ' : ';
+	DECLARE xmlChar CHARACTER convertirXMLAChar(xml.*);
+	RETURN trama || xmlChar;
+END;
+
+CREATE FUNCTION convertirXMLAChar(IN container REFERENCE) RETURNS CHARACTER
+BEGIN
+	DECLARE blobMsg BLOB ASBITSTREAM(container, 273, 1208, '', '', '', FolderBitStream);
+	DECLARE charMsg CHARACTER CAST(blobMsg AS CHAR CCSID 1208 ENCODING 273);
+	RETURN REPLACE(charMsg, '\/', '/');
+END;
+
+CREATE FUNCTION nvlTrim(IN valor CHARACTER, IN valor_default CHARACTER) RETURNS CHARACTER
+BEGIN
+	IF LENGTH(TRIM(COALESCE(valor, ''))) > 0 THEN
+		RETURN valor;
+	END IF;
+	RETURN valor_default;
+END;
+
+CREATE PROCEDURE validarResultadoInt(IN resultado INT) RETURNS CHARACTER
+BEGIN
+	IF resultado < 0 THEN
+		RETURN 'error';
+	END IF;
+	RETURN 'success';
+END;
+CREATE PROCEDURE validarResultado(IN resultado CHARACTER) RETURNS CHARACTER
+BEGIN
+	IF resultado IS NULL OR LENGTH(resultado) = 0 OR resultado IS NOT NUMBER OR CAST(resultado AS INTEGER) < 0 THEN
+		RETURN 'error';
+	END IF;
+	RETURN 'success';
+END;
+
+CREATE FUNCTION convertirChar2Date(IN fecha CHARACTER, IN formato CHARACTER) RETURNS DATE
+BEGIN
+	RETURN CAST(fecha AS DATE FORMAT formato);
+END;
+
+CREATE FUNCTION obtenerSecuencial() RETURNS INTEGER
+BEGIN
+	UPDATE Database.{INSTANCIA}.LOG_SECUENCIAL set REQUEST_DATETIME = CURRENT_TIMESTAMP;
+	
+	DECLARE sql CHARACTER 'select ID_LOG FROM ' || INSTANCIA || '.LOG_SECUENCIAL';
+	DECLARE consulta ROW;
+	SET consulta.datos[] = PASSTHRU(
+		sql
+	);
+	RETURN CAST(consulta.datos.ID_LOG AS INTEGER);
+END;

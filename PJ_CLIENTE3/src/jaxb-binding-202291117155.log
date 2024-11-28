@@ -1,0 +1,15 @@
+Running command...
+C:\Program Files\IBM\IIB\10.0.0.6\common\jdk\bin\xjc.exe -d "C:\Users\Bancoppel\git\dev\workspace_cliente3\PJ_CLIENTE3\src" -p "bancoppel.cliente3.schema.SpConsPeriocidad" "C:\Users\Bancoppel\git\dev\workspace_cliente3\LIB_CLIENTE3_MS\SpConsPeriocidad.xsd" 
+parsing a schema...
+[WARNING] schema_reference.4: anomal¡a al leer el documento de esquema '../LIB_LOG/Cabecera.xsd', porque 1) no se ha podido encontrar el documento; 2) no se ha podido leer el documento; 3) el elemento ra¡z del documento no es <xsd:schema>.
+  line 3 of file:/C:/Users/Bancoppel/git/dev/workspace_cliente3/LIB_CLIENTE3_MS/SpConsPeriocidad.xsd
+
+[WARNING] java.io.FileNotFoundException: C:\Users\Bancoppel\git\dev\workspace_cliente3\LIB_LOG\Cabecera.xsd (El sistema no puede encontrar la ruta especificada)
+  line 3 of file:/C:/Users/Bancoppel/git/dev/workspace_cliente3/LIB_CLIENTE3_MS/SpConsPeriocidad.xsd
+
+compiling a schema...
+bancoppel\cliente3\schema\SpConsPeriocidad\ObjectFactory.java
+bancoppel\cliente3\schema\SpConsPeriocidad\SpConsPeriocidadRegistroType.java
+bancoppel\cliente3\schema\SpConsPeriocidad\SpConsPeriocidadResponseType.java
+bancoppel\cliente3\schema\SpConsPeriocidad\SpConsPeriocidadType.java
+bancoppel\cliente3\schema\SpConsPeriocidad\package-info.java

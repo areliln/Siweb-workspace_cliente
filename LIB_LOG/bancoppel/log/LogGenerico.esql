@@ -1,0 +1,55 @@
+BROKER SCHEMA bancoppel.log
+
+
+CREATE COMPUTE MODULE LogGenerico
+	DECLARE SERVICIO EXTERNAL CHARACTER;
+	DECLARE TIPO EXTERNAL CHARACTER;
+	DECLARE log NAMESPACE 'http://www.bancoppel.com/Logger';
+	
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		
+		DECLARE bodyBlob BLOB ASBITSTREAM(InputRoot.JSON.Data); 
+		DECLARE bodyAsChar CHAR CAST(bodyBlob AS CHAR CCSID 1208);
+		-- Propagar la respuesta al MQOutput
+		
+		SET OutputRoot.XMLNSC.log:Log.trace.idTrxGlobal = nvlTrim(Environment.trace.idTrxGlobal, '-');
+		SET OutputRoot.XMLNSC.log:Log.trace.sistemaOrigen = nvlTrim(Environment.trace.sistemaOrigen, '-');
+		SET OutputRoot.XMLNSC.log:Log.trace.referencia = nvlTrim(Environment.operacion, '-') || '_' || CAST(CURRENT_TIMESTAMP AS CHARACTER FORMAT 'yyyyMMdd_HHmmss');
+		SET OutputRoot.XMLNSC.log:Log.trace.servicio = SERVICIO;		
+		SET OutputRoot.XMLNSC.log:Log.trace.trama = TIPO || ' ' || REPLACE(bodyAsChar, '\/', '/');
+		SET OutputRoot.XMLNSC.log:Log.trace.estatus = 'success';
+		
+		PROPAGATE TO TERMINAL 'out1';
+		
+		-- Propagar todo el mensaje al Flujo
+		
+		SET OutputRoot = InputRoot;
+		
+		RETURN TRUE;
+	END;
+END MODULE;
+
+CREATE COMPUTE MODULE LogGenericoXML
+	DECLARE SERVICIO EXTERNAL CHARACTER;
+	DECLARE log NAMESPACE 'http://www.bancoppel.com/Logger';
+	
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- Propagar la respuesta al MQOutput
+		SET OutputRoot.XMLNSC.log:Log.trace.idTrxGlobal = nvlTrim(Environment.trace.idTrxGlobal, '-');
+		SET OutputRoot.XMLNSC.log:Log.trace.sistemaOrigen = nvlTrim(Environment.trace.sistemaOrigen, '-');
+		SET OutputRoot.XMLNSC.log:Log.trace.referencia = nvlTrim(Environment.operacion, '-') || '_' || CAST(CURRENT_TIMESTAMP AS CHARACTER FORMAT 'yyyyMMdd_HHmmss');
+		SET OutputRoot.XMLNSC.log:Log.trace.servicio = SERVICIO;
+		SET OutputRoot.XMLNSC.log:Log.trace.trama = construirTramaWS(InputLocalEnvironment.WrittenDestination.SOAP.Request.Transport.HTTP.WebServiceURL, InputRoot.XMLNSC);
+		SET OutputRoot.XMLNSC.log:Log.trace.estatus = 'success';
+		
+		PROPAGATE TO TERMINAL 'out1';
+		
+		-- Propagar todo el mensaje al Flujo
+		
+		SET OutputRoot = InputRoot;
+		
+		RETURN TRUE;
+	END;
+END MODULE;

@@ -1,0 +1,254 @@
+BROKER SCHEMA bancoppel.log
+
+	DECLARE ns NAMESPACE 'http://schemas.xmlsoap.org/soap/envelope/';
+	DECLARE log NAMESPACE 'http://www.bancoppel.com/Logger';
+	DECLARE SERVICIO EXTERNAL CHARACTER;
+	DECLARE SOAP_FAULTCODE_VALUE_CLIENT CHARACTER 'Client';
+	
+CREATE COMPUTE MODULE ManejarExcepcion_errorTimeout
+	DECLARE SERVICIO EXTERNAL CHARACTER;
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		IF EXISTS(InputExceptionList.*[]) THEN
+			
+			DECLARE ListaErrores REFERENCE TO InputExceptionList.*[1];
+			DECLARE MsgErrorNum INTEGER 0;
+			DECLARE ErrorCompleto CHARACTER '';
+			
+			WHILE LASTMOVE(ListaErrores) DO
+			 	IF ListaErrores.Number IS NOT NULL THEN 
+					SET MsgErrorNum = ListaErrores.Number;
+			 		SET ErrorCompleto = ListaErrores.Text;
+			 		FOR ins AS ListaErrores.Insert[] DO
+			 			IF LENGTH(TRIM(ins.Text)) > 0 THEN
+				 			SET ErrorCompleto = ErrorCompleto || ' || ' || ins.Text;
+			 			END IF;
+			 		END FOR;
+				END IF;
+			 	MOVE ListaErrores LASTCHILD;
+			END WHILE;
+			
+			-- Construir la respuesta al MQOutput
+			
+			SET OutputRoot.XMLNSC.log:Log.trace.idTrxGlobal = MsgErrorNum;
+			SET OutputRoot.XMLNSC.log:Log.trace.sistemaOrigen = MessageFlowLabel;
+			SET OutputRoot.XMLNSC.log:Log.trace.referencia = MessageFlowLabel || '_' || CAST(CURRENT_TIMESTAMP AS CHARACTER FORMAT 'yyyyMMdd_HHmmss');
+			SET OutputRoot.XMLNSC.log:Log.trace.servicio = SERVICIO;
+			SET OutputRoot.XMLNSC.log:Log.trace.trama = ErrorCompleto;
+			SET OutputRoot.XMLNSC.log:Log.trace.estatus = 'error';
+			SET OutputRoot.XMLNSC.log:Log.error.codigo = MsgErrorNum;
+			SET OutputRoot.XMLNSC.log:Log.error.descripcion = ErrorCompleto;
+			SET OutputRoot.XMLNSC.log:Log.error.detalleTecnico = MessageFlowLabel || '_' || CAST(CURRENT_TIMESTAMP AS CHARACTER FORMAT 'yyyyMMdd_HHmmss') || ' || ' || ErrorCompleto;
+		
+		END IF;
+		
+		RETURN TRUE;
+	END;
+END MODULE;
+
+CREATE COMPUTE MODULE ManejarExcepcion_transformarExcepcion
+	DECLARE SERVICIO EXTERNAL CHARACTER;
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		IF EXISTS(InputExceptionList.*[]) THEN
+			
+			DECLARE ListaErrores REFERENCE TO InputExceptionList.*[1];
+			DECLARE MsgErrorNum INTEGER 0;
+			DECLARE ErrorCompleto CHARACTER '';
+			
+			WHILE LASTMOVE(ListaErrores) DO
+			 	IF ListaErrores.Number IS NOT NULL THEN 
+					SET MsgErrorNum = ListaErrores.Number;
+			 		SET ErrorCompleto = ListaErrores.Text;
+			 		FOR ins AS ListaErrores.Insert[] DO
+			 			IF LENGTH(TRIM(ins.Text)) > 0 THEN
+				 			SET ErrorCompleto = ErrorCompleto || ' || ' || ins.Text;
+			 			END IF;
+			 		END FOR;
+				END IF;
+			 	MOVE ListaErrores LASTCHILD;
+			END WHILE;
+			
+			-- Propagar la respuesta al MQOutput
+				
+			SET OutputRoot.XMLNSC.log:Log.trace.idTrxGlobal = MsgErrorNum;
+			SET OutputRoot.XMLNSC.log:Log.trace.sistemaOrigen = MessageFlowLabel;
+			SET OutputRoot.XMLNSC.log:Log.trace.referencia = MessageFlowLabel || '_' || CAST(CURRENT_TIMESTAMP AS CHARACTER FORMAT 'yyyyMMdd_HHmmss');
+			SET OutputRoot.XMLNSC.log:Log.trace.servicio = SERVICIO;
+			SET OutputRoot.XMLNSC.log:Log.trace.trama = ErrorCompleto;
+			SET OutputRoot.XMLNSC.log:Log.trace.estatus = 'error';
+			SET OutputRoot.XMLNSC.log:Log.error.codigo = MsgErrorNum;
+			SET OutputRoot.XMLNSC.log:Log.error.descripcion = ErrorCompleto;
+			SET OutputRoot.XMLNSC.log:Log.error.detalleTecnico = MessageFlowLabel || '_' || CAST(CURRENT_TIMESTAMP AS CHARACTER FORMAT 'yyyyMMdd_HHmmss') || ' || ' || ErrorCompleto;
+			
+			PROPAGATE TO TERMINAL 'out1';
+			
+			-- Propagar la respuesta al SOAPReply
+			SET OutputRoot.SOAP.Body.ns:Fault.faultcode = SOAP_FAULTCODE_VALUE_CLIENT;
+			SET OutputRoot.SOAP.Body.ns:Fault.faultstring = 'Error al ejecutar servicio';
+			SET OutputRoot.SOAP.Body.ns:Fault.faultactor = InputRoot.HTTPInputHeader."X-Original-HTTP-Command";
+			-- Versión ampliada del Fault, Descomentar las siguientes 3 líneas si se quiere
+			SET OutputRoot.SOAP.Body.ns:Fault.detail.ExceptionNumber = MsgErrorNum;
+			SET OutputRoot.SOAP.Body.ns:Fault.detail.ExceptionType = ErrorCompleto;
+			SET OutputRoot.SOAP.Body.ns:Fault.detail.ExceptionDetail = ErrorCompleto;
+			-- status code must be an error code, otherwise Fault message will not be parsed on receiver
+			SET OutputLocalEnvironment.Destination.SOAP.Reply.Transport.HTTP.ReplyStatusCode = 500;
+		
+		END IF;
+		
+		RETURN TRUE;
+	END;
+END MODULE;
+
+CREATE COMPUTE MODULE ManejarExcepcion_transformarJSON
+DECLARE SERVICIO EXTERNAL CHARACTER;
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		IF EXISTS(InputExceptionList.*[]) THEN
+			
+			DECLARE ListaErrores REFERENCE TO InputExceptionList.*[1];
+			DECLARE MsgErrorNum INTEGER 0;
+			DECLARE ErrorCompleto CHARACTER '';
+			
+			WHILE LASTMOVE(ListaErrores) DO
+			 	IF ListaErrores.Number IS NOT NULL THEN 
+					SET MsgErrorNum = ListaErrores.Number;
+			 		SET ErrorCompleto = ListaErrores.Text;
+			 		FOR ins AS ListaErrores.Insert[] DO
+			 			IF LENGTH(TRIM(ins.Text)) > 0 THEN
+				 			SET ErrorCompleto = ErrorCompleto || ' || ' || ins.Text;
+			 			END IF;
+			 		END FOR;
+				END IF;
+			 	MOVE ListaErrores LASTCHILD;
+			END WHILE;
+			
+			-- Propagar la respuesta al MQOutput
+				
+			SET OutputRoot.XMLNSC.log:Log.trace.idTrxGlobal = nvlTrim(COALESCE(Environment.trace.idTrxGlobal, InputRoot.JSON.Data.cabecera.idTrxGlobal), '-');
+			SET OutputRoot.XMLNSC.log:Log.trace.sistemaOrigen = nvlTrim(COALESCE(Environment.trace.sistemaOrigen, InputRoot.JSON.Data.cabecera.sistemaOrigen), '-');
+			-- SET OutputRoot.XMLNSC.log:Log.trace.referencia = MessageFlowLabel || '_' || CAST(CURRENT_TIMESTAMP AS CHARACTER FORMAT 'yyyyMMdd_HHmmss');
+			SET OutputRoot.XMLNSC.log:Log.trace.referencia = nvlTrim(COALESCE(Environment.operacion), '-') || '_' || CAST(CURRENT_TIMESTAMP AS CHARACTER FORMAT 'yyyyMMdd_HHmmss');
+			SET OutputRoot.XMLNSC.log:Log.trace.servicio = SERVICIO;
+			SET OutputRoot.XMLNSC.log:Log.trace.trama = ErrorCompleto;
+			SET OutputRoot.XMLNSC.log:Log.trace.estatus = 'error';
+			SET OutputRoot.XMLNSC.log:Log.error.codigo = MsgErrorNum;
+			SET OutputRoot.XMLNSC.log:Log.error.descripcion = ErrorCompleto;
+			SET OutputRoot.XMLNSC.log:Log.error.detalleTecnico = nvlTrim(COALESCE(Environment.operacion), '-') || '_' || CAST(CURRENT_TIMESTAMP AS CHARACTER FORMAT 'yyyyMMdd_HHmmss') || ' || ' || ErrorCompleto;
+			
+			PROPAGATE TO TERMINAL 'out1';
+			
+			-- Propagar la respuesta al HTTPReply
+
+			SET OutputRoot.JSON.Data.error.ExceptionNumber = MsgErrorNum;
+			SET OutputRoot.JSON.Data.error.ExceptionType = ErrorCompleto;
+			SET OutputRoot.JSON.Data.error.ExceptionDetail = nvlTrim(COALESCE(Environment.operacion), '-') || '_' || CAST(CURRENT_TIMESTAMP AS CHARACTER FORMAT 'yyyyMMdd_HHmmss') || ' || ' || ErrorCompleto;
+		
+		END IF;
+		
+		RETURN TRUE;
+	END;
+	
+END MODULE;
+
+CREATE COMPUTE MODULE ManejarExcepcion_transformarGET
+DECLARE SERVICIO EXTERNAL CHARACTER;
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		IF EXISTS(InputExceptionList.*[]) THEN
+			
+			DECLARE ListaErrores REFERENCE TO InputExceptionList.*[1];
+			DECLARE MsgErrorNum INTEGER 0;
+			DECLARE ErrorCompleto CHARACTER '';
+			
+			WHILE LASTMOVE(ListaErrores) DO
+			 	IF ListaErrores.Number IS NOT NULL THEN 
+					SET MsgErrorNum = ListaErrores.Number;
+			 		SET ErrorCompleto = ListaErrores.Text;
+			 		FOR ins AS ListaErrores.Insert[] DO
+			 			IF LENGTH(TRIM(ins.Text)) > 0 THEN
+				 			SET ErrorCompleto = ErrorCompleto || ' || ' || ins.Text;
+			 			END IF;
+			 		END FOR;
+				END IF;
+			 	MOVE ListaErrores LASTCHILD;
+			END WHILE;
+			
+			-- Propagar la respuesta al MQOutput
+						
+			SET Environment.trace.idTrxGlobal = nvlTrim(COALESCE(Environment.trace.idTrxGlobal, InputLocalEnvironment.REST.Input.Parameters.idTrxGlobal), '-');
+			SET Environment.trace.sistemaOrigen = nvlTrim(COALESCE(Environment.trace.sistemaOrigen, InputLocalEnvironment.REST.Input.Parameters.sistemaOrigen), '-');
+			SET OutputRoot.XMLNSC.log:Log.trace.referencia = MessageFlowLabel || '_' || CAST(CURRENT_TIMESTAMP AS CHARACTER FORMAT 'yyyyMMdd_HHmmss');
+			SET OutputRoot.XMLNSC.log:Log.trace.servicio = SERVICIO;
+			SET OutputRoot.XMLNSC.log:Log.trace.trama = ErrorCompleto;
+			SET OutputRoot.XMLNSC.log:Log.trace.estatus = 'error';
+			SET OutputRoot.XMLNSC.log:Log.error.codigo = MsgErrorNum;
+			SET OutputRoot.XMLNSC.log:Log.error.descripcion = ErrorCompleto;
+			SET OutputRoot.XMLNSC.log:Log.error.detalleTecnico = MessageFlowLabel || '_' || CAST(CURRENT_TIMESTAMP AS CHARACTER FORMAT 'yyyyMMdd_HHmmss') || ' || ' || ErrorCompleto;
+			
+			PROPAGATE TO TERMINAL 'out1';
+			
+			-- Propagar la respuesta al HTTPReply
+			
+			-- Versión ampliada del Fault, Descomentar las siguientes 3 líneas si se quiere
+			SET OutputRoot.JSON.Data.error.ExceptionNumber = MsgErrorNum;
+			SET OutputRoot.JSON.Data.error.ExceptionType = ErrorCompleto;
+			SET OutputRoot.JSON.Data.error.ExceptionDetail = MessageFlowLabel || '_' || CAST(CURRENT_TIMESTAMP AS CHARACTER FORMAT 'yyyyMMdd_HHmmss') || ' || ' || ErrorCompleto;
+		
+		END IF;
+		
+		RETURN TRUE;
+	END;
+	
+END MODULE;
+
+CREATE COMPUTE MODULE ManejarExcepcion_transformarJSONHuellas442
+DECLARE SERVICIO EXTERNAL CHARACTER;
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		IF EXISTS(InputExceptionList.*[]) THEN
+			
+			DECLARE ListaErrores REFERENCE TO InputExceptionList.*[1];
+			DECLARE MsgErrorNum INTEGER 0;
+			DECLARE ErrorCompleto CHARACTER '';
+			
+			WHILE LASTMOVE(ListaErrores) DO
+			 	IF ListaErrores.Number IS NOT NULL THEN 
+					SET MsgErrorNum = ListaErrores.Number;
+			 		SET ErrorCompleto = ListaErrores.Text;
+			 		FOR ins AS ListaErrores.Insert[] DO
+			 			IF LENGTH(TRIM(ins.Text)) > 0 THEN
+				 			SET ErrorCompleto = ErrorCompleto || ' || ' || ins.Text;
+			 			END IF;
+			 		END FOR;
+				END IF;
+			 	MOVE ListaErrores LASTCHILD;
+			END WHILE;
+			
+			-- Propagar la respuesta al MQOutput
+				
+			SET OutputRoot.XMLNSC.log:Log.trace.idTrxGlobal = nvlTrim(COALESCE(Environment.trace.idTrxGlobal, InputRoot.JSON.Data.cabecera.idTrxGlobal), '-');
+			SET OutputRoot.XMLNSC.log:Log.trace.sistemaOrigen = nvlTrim(COALESCE(Environment.trace.sistemaOrigen, InputRoot.JSON.Data.cabecera.sistemaOrigen), '-');
+			-- SET OutputRoot.XMLNSC.log:Log.trace.referencia = MessageFlowLabel || '_' || CAST(CURRENT_TIMESTAMP AS CHARACTER FORMAT 'yyyyMMdd_HHmmss');
+			SET OutputRoot.XMLNSC.log:Log.trace.referencia = nvlTrim(COALESCE(Environment.operacion), '-') || '_' || CAST(CURRENT_TIMESTAMP AS CHARACTER FORMAT 'yyyyMMdd_HHmmss');
+			SET OutputRoot.XMLNSC.log:Log.trace.servicio = SERVICIO;
+			SET OutputRoot.XMLNSC.log:Log.trace.trama = ErrorCompleto;
+			SET OutputRoot.XMLNSC.log:Log.trace.estatus = 'error';
+			SET OutputRoot.XMLNSC.log:Log.error.codigo = MsgErrorNum;
+			SET OutputRoot.XMLNSC.log:Log.error.descripcion = ErrorCompleto;
+			SET OutputRoot.XMLNSC.log:Log.error.detalleTecnico = nvlTrim(COALESCE(Environment.operacion), '-') || '_' || CAST(CURRENT_TIMESTAMP AS CHARACTER FORMAT 'yyyyMMdd_HHmmss') || ' || ' || ErrorCompleto || ' SistemaOrigen: ' || Environment.trace.sistemaOrigen || ' || idEmpleado: ' || Environment.idEmpleado || ' || sucursal: ' || Environment.sucursal || ' || ip: ' || Environment.ip || ' || mac: ' || Environment.mac || ' || operador: ' || Environment.operador || ' || idCliente: ' || Environment.idCliente;
+			
+			PROPAGATE TO TERMINAL 'out1';
+			
+			-- Propagar la respuesta al HTTPReply
+
+			SET OutputRoot.JSON.Data.error.ExceptionNumber = MsgErrorNum;
+			SET OutputRoot.JSON.Data.error.ExceptionType = ErrorCompleto;
+			SET OutputRoot.JSON.Data.error.ExceptionDetail = nvlTrim(COALESCE(Environment.operacion), '-') || '_' || CAST(CURRENT_TIMESTAMP AS CHARACTER FORMAT 'yyyyMMdd_HHmmss') || ' || ' || ErrorCompleto || ' SistemaOrigen: ' || Environment.trace.sistemaOrigen || ' || idEmpleado: ' || Environment.idEmpleado || ' || sucursal: ' || Environment.sucursal || ' || ip: ' || Environment.ip || ' || mac: ' || Environment.mac || ' || operador: ' || Environment.operador || ' || idCliente: ' || Environment.idCliente;
+		
+		END IF;
+		
+		RETURN TRUE;
+	END;
+	
+END MODULE;

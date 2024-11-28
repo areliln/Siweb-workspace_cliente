@@ -1,0 +1,37 @@
+BROKER SCHEMA bancoppel.general
+
+CREATE COMPUTE MODULE StatusCode200
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		SET OutputRoot = InputRoot;
+		SET OutputLocalEnvironment.Destination.HTTP.ReplyStatusCode = 200; 
+		RETURN TRUE;
+	END;
+END MODULE;
+
+CREATE COMPUTE MODULE StatusCode204
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		SET OutputRoot = InputRoot;
+		SET OutputLocalEnvironment.Destination.HTTP.ReplyStatusCode = 204; 
+		RETURN TRUE;
+	END;
+END MODULE;
+
+CREATE COMPUTE MODULE StatusCode400
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		SET OutputRoot = InputRoot;
+		SET OutputLocalEnvironment.Destination.HTTP.ReplyStatusCode = 400; 
+		RETURN TRUE;
+	END;
+END MODULE;
+
+CREATE COMPUTE MODULE StatusCode500
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		SET OutputRoot = InputRoot;
+		SET OutputLocalEnvironment.Destination.HTTP.ReplyStatusCode = 500; 
+		RETURN TRUE;
+	END;
+END MODULE;

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    name="Cliente3" targetNamespace="http://www.bancoppel.com/Cliente3/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.bancoppel.com/Cliente3/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsd1="http://www.bancoppel.com/Cliente3/SpConsultaClienteseIndividual/" 
+    xmlns:xsd2="http://www.bancoppel.com/Cliente3/SpConsultaDatosCteCoppel/" 
+    xmlns:xsd3="http://www.bancoppel.com/Cliente3/SpConsPeriocidad/"
+    xmlns:xsd4="http://www.bancoppel.com/Cliente3/SpConsultaVencidoBancoppel/"
+    xmlns:xsd5="http://www.bancoppel.com/Cliente3/TarjCop/"
+ > 
+    <wsdl:documentation>
+        <wsdl:appinfo source="WMQI_APPINFO">
+            <MRWSDLAppInfo imported="true">
+                <binding hasEncoding="false" imported="true" name="Cliente3SOAP"
+                    originalBindingStyle="document" />
+            </MRWSDLAppInfo>
+        </wsdl:appinfo>
+    </wsdl:documentation>
+    <wsdl:types>
+        <xsd:schema>
+        	<xsd:import namespace="http://www.bancoppel.com/Cliente3/SpConsultaClienteseIndividual/" schemaLocation="SpConsultaClienteseIndividual.xsd" />
+        	<xsd:import namespace="http://www.bancoppel.com/Cliente3/SpConsultaDatosCteCoppel/" schemaLocation="SpConsultaDatosCteCoppel.xsd" />
+        	<xsd:import namespace="http://www.bancoppel.com/Cliente3/SpConsPeriocidad/" schemaLocation="SpConsPeriocidad.xsd" />
+        	<xsd:import namespace="http://www.bancoppel.com/Cliente3/SpConsultaVencidoBancoppel/" schemaLocation="SpConsultaVencidoBancoppel.xsd" />
+        	<xsd:import namespace="http://www.bancoppel.com/Cliente3/TarjCop/" schemaLocation="TarjCop.xsd" />
+        </xsd:schema>
+    </wsdl:types>
+    <wsdl:message name="SpConsultaClienteseIndividualRequest">
+        <wsdl:part element="xsd1:SpConsultaClienteseIndividual" name="request" />
+    </wsdl:message>
+    <wsdl:message name="SpConsultaClienteseIndividualResponse">
+        <wsdl:part element="xsd1:SpConsultaClienteseIndividualResponse" name="response" />
+    </wsdl:message>
+     <wsdl:message name="SpConsultaDatosCteCoppelRequest">
+        <wsdl:part element="xsd2:SpConsultaDatosCteCoppel" name="request" />
+    </wsdl:message>
+    <wsdl:message name="SpConsultaDatosCteCoppelResponse">
+        <wsdl:part element="xsd2:SpConsultaDatosCteCoppelResponse" name="response" />
+    </wsdl:message>
+    <wsdl:message name="SpConsPeriocidadRequest">
+        <wsdl:part element="xsd3:SpConsPeriocidad" name="request" />
+    </wsdl:message>
+    <wsdl:message name="SpConsPeriocidadResponse">
+        <wsdl:part element="xsd3:SpConsPeriocidadResponse" name="response" />
+    </wsdl:message>
+    
+    <wsdl:message name="SpConsultaVencidoBancoppelRequest">
+        <wsdl:part element="xsd4:SpConsultaVencidoBancoppel" name="request" />
+    </wsdl:message>
+    <wsdl:message name="SpConsultaVencidoBancoppelResponse">
+        <wsdl:part element="xsd4:SpConsultaVencidoBancoppelResponse" name="response" />
+    </wsdl:message>
+    
+    <wsdl:message name="TarjCopRequest">
+        <wsdl:part element="xsd5:TarjCop" name="request" />
+    </wsdl:message>
+    <wsdl:message name="TarjCopResponse">
+        <wsdl:part element="xsd5:TarjCopResponse" name="response" />
+    </wsdl:message>
+    
+    <wsdl:portType name="Cliente3">
+        <wsdl:operation name="SpConsultaClienteseIndividual">
+            <wsdl:input message="tns:SpConsultaClienteseIndividualRequest" />
+            <wsdl:output message="tns:SpConsultaClienteseIndividualResponse" />
+        </wsdl:operation>
+         <wsdl:operation name="SpConsultaDatosCteCoppel">
+            <wsdl:input message="tns:SpConsultaDatosCteCoppelRequest" />
+            <wsdl:output message="tns:SpConsultaDatosCteCoppelResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="SpConsPeriocidad">
+            <wsdl:input message="tns:SpConsPeriocidadRequest" />
+            <wsdl:output message="tns:SpConsPeriocidadResponse" />
+        </wsdl:operation>
+        
+        <wsdl:operation name="SpConsultaVencidoBancoppel">
+            <wsdl:input message="tns:SpConsultaVencidoBancoppelRequest" />
+            <wsdl:output message="tns:SpConsultaVencidoBancoppelResponse" />
+        </wsdl:operation>
+        
+        <wsdl:operation name="TarjCop">
+            <wsdl:input message="tns:TarjCopRequest" />
+            <wsdl:output message="tns:TarjCopResponse" />
+        </wsdl:operation>
+        
+        
+    </wsdl:portType>
+    <wsdl:binding name="Cliente3SOAP" type="tns:Cliente3">
+        <soap:binding style="document"
+            transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="SpConsultaClienteseIndividual">
+            <soap:operation soapAction="http://www.bancoppel.com/Cliente3/SpConsultaClienteseIndividual" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="SpConsultaDatosCteCoppel">
+            <soap:operation soapAction="http://www.bancoppel.com/Cliente3/SpConsultaDatosCteCoppel" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="SpConsPeriocidad">
+            <soap:operation soapAction="http://www.bancoppel.com/Cliente3/SpConsPeriocidad" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        
+        <wsdl:operation name="SpConsultaVencidoBancoppel">
+            <soap:operation soapAction="http://www.bancoppel.com/Cliente3/SpConsultaVencidoBancoppel" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        
+       <wsdl:operation name="TarjCop">
+            <soap:operation soapAction="http://www.bancoppel.com/Cliente3/TarjCop" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        
+        </wsdl:binding>
+    	<wsdl:service name="Cliente3">
+        <wsdl:port binding="tns:Cliente3SOAP" name="Cliente3SOAP">
+            <soap:address location="http://localhost:7800/bancoppel/Cliente3" />
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

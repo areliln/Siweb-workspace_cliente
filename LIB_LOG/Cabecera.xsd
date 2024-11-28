@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.bancoppel.com/Logger" xmlns:ns="http://www.bancoppel.com/Logger">
+	<xsd:complexType name="CabeceraType">
+		<xsd:sequence>
+			<xsd:element maxOccurs="1" minOccurs="1" name="idTrxGlobal" type="xsd:string" />
+			<xsd:element maxOccurs="1" minOccurs="1" name="sistemaOrigen" type="xsd:string" />
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

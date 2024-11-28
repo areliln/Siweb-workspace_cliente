@@ -1,0 +1,12 @@
+BROKER SCHEMA bancoppel.log
+
+CREATE COMPUTE MODULE ConstruirTrama
+	DECLARE ENDPOINT EXTERNAL CHARACTER;
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		SET OutputLocalEnvironment = InputLocalEnvironment;
+		SET OutputLocalEnvironment.Destination.SOAP.Request.Transport.HTTP.WebServiceURL = ENDPOINT;
+		SET Environment.trace.trama = construirTramaWS(OutputLocalEnvironment.Destination.SOAP.Request.Transport.HTTP.WebServiceURL, InputRoot.XMLNSC);
+		RETURN TRUE;
+	END;
+END MODULE;

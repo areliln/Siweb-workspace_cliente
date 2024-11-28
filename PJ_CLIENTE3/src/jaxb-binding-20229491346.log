@@ -1,0 +1,10 @@
+Running command...
+C:\Program Files\IBM\IIB\10.0.0.6\common\jdk\bin\xjc.exe -d "C:\Users\arturo.acosta\IBM\IIBT10\workspace_cliente3\PJ_CLIENTE3\src" -p "bancoppel.cliente3.schema.SpConsultaClienteseIndividual" "C:\Users\arturo.acosta\IBM\IIBT10\workspace_cliente3\LIB_CLIENTE3_MS\SpConsultaClienteseIndividual.xsd" 
+parsing a schema...
+compiling a schema...
+bancoppel\cliente3\schema\SpConsultaClienteseIndividual\CabeceraType.java
+bancoppel\cliente3\schema\SpConsultaClienteseIndividual\ObjectFactory.java
+bancoppel\cliente3\schema\SpConsultaClienteseIndividual\SpConsultaClienteseIndividualRegistroType.java
+bancoppel\cliente3\schema\SpConsultaClienteseIndividual\SpConsultaClienteseIndividualResponseType.java
+bancoppel\cliente3\schema\SpConsultaClienteseIndividual\SpConsultaClienteseIndividualType.java
+bancoppel\cliente3\schema\SpConsultaClienteseIndividual\package-info.java

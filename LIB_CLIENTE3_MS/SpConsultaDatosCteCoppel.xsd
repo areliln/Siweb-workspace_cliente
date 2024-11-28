@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="http://www.bancoppel.com/Cliente3/SpConsultaDatosCteCoppel/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ibmSchExtn="http://www.ibm.com/schema/extensions" xmlns:ns="http://www.bancoppel.com/Cliente3/SpConsultaDatosCteCoppel/" xmlns:log="http://www.bancoppel.com/Logger">
+	<xsd:import schemaLocation="../LIB_LOG/Cabecera.xsd" namespace="http://www.bancoppel.com/Logger" /> 
+	<xsd:complexType name="SpConsultaDatosCteCoppelType">
+		<xsd:sequence>
+			<xsd:element name="cabecera" type="log:CabeceraType" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="numCte" type="xsd:string" minOccurs="0" maxOccurs="1" />
+	</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="SpConsultaDatosCteCoppelResponseType"> 
+		<xsd:sequence>
+			<xsd:element name="registro" type="ns:SpConsultaDatosCteCoppelRegistroType" minOccurs="0" maxOccurs="unbounded" />
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="SpConsultaDatosCteCoppelRegistroType">
+		<xsd:sequence>
+			<xsd:element name="cCodRet" type="xsd:string" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="cIngresoMensual" type="xsd:int" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="cOpcionPuesto" type="xsd:int" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="cSubOpcionPuesto" type="xsd:int" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="cTiempoEdoCivil" type="xsd:string" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="cTiempoRecide" type="xsd:string" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="cTipoRef" type="xsd:string" minOccurs="0" maxOccurs="1" />
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element ibmSchExtn:docRoot="true" name="SpConsultaDatosCteCoppel" type="ns:SpConsultaDatosCteCoppelType" />
+	<xsd:element ibmSchExtn:docRoot="true" name="SpConsultaDatosCteCoppelResponse" type="ns:SpConsultaDatosCteCoppelResponseType" />
+</xsd:schema>

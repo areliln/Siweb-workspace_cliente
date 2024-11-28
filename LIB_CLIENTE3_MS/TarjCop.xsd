@@ -1,0 +1,26 @@
+<xsd:schema targetNamespace="http://www.bancoppel.com/Cliente3/TarjCop/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ibmSchExtn="http://www.ibm.com/schema/extensions" xmlns:ns="http://www.bancoppel.com/Cliente3/TarjCop/" xmlns:log="http://www.bancoppel.com/Logger">
+<xsd:import schemaLocation="../LIB_LOG/Cabecera.xsd" namespace="http://www.bancoppel.com/Logger" /> 
+	<xsd:complexType name="TarjCopType">
+		<xsd:sequence>
+			<xsd:element name="cabecera" type="log:CabeceraType" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="pNumCte" type="xsd:string" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="PNumTarcoppel" type="xsd:string" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="POption" type="xsd:int" minOccurs="0" maxOccurs="1" />
+	</xsd:sequence>
+	</xsd:complexType> 
+	<xsd:complexType name="TarjCopResponseType"> 
+		<xsd:sequence>
+			<xsd:element name="registro" type="ns:TarjCopRegistroType" minOccurs="0" maxOccurs="unbounded" />
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="TarjCopRegistroType">
+		<xsd:sequence>
+			<xsd:element name="vCodRet1" type="xsd:string" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="vTarjCop" type="xsd:string" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="cNombre" type="xsd:string" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="mSolicitado" type="xsd:decimal" minOccurs="0" maxOccurs="1" />
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element ibmSchExtn:docRoot="true" name="TarjCop" type="ns:TarjCopType" />
+	<xsd:element ibmSchExtn:docRoot="true" name="TarjCopResponse" type="ns:TarjCopResponseType" />
+</xsd:schema>

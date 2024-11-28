@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="http://www.bancoppel.com/Cliente3/SpConsultaVencidoBancoppel/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ibmSchExtn="http://www.ibm.com/schema/extensions" xmlns:ns="http://www.bancoppel.com/Cliente3/SpConsultaVencidoBancoppel/" xmlns:log="http://www.bancoppel.com/Logger">
+	<xsd:import schemaLocation="../LIB_LOG/Cabecera.xsd" namespace="http://www.bancoppel.com/Logger" /> 
+	<xsd:complexType name="SpConsultaVencidoBancoppelType">
+		<xsd:sequence>
+			<xsd:element name="cabecera" type="log:CabeceraType" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="pNumCliente" type="xsd:string" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="pTipoCliente" type="xsd:string" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="gen1" type="xsd:string" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="gen2" type="xsd:string" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="gen3" type="xsd:string" minOccurs="0" maxOccurs="1" />
+	</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="SpConsultaVencidoBancoppelResponseType"> 
+		<xsd:sequence>
+			<xsd:element name="registro" type="ns:SpConsultaVencidoBancoppelRegistroType" minOccurs="0" maxOccurs="unbounded" />
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="SpConsultaVencidoBancoppelRegistroType">
+		<xsd:sequence>
+			<xsd:element name="sCodRet" type="xsd:string" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="sMensaje" type="xsd:string" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="sNumeroCliente" type="xsd:string" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="sIdVencido" type="xsd:string" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="sIdSaturacion" type="xsd:string" minOccurs="0" maxOccurs="1" />
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element ibmSchExtn:docRoot="true" name="SpConsultaVencidoBancoppel" type="ns:SpConsultaVencidoBancoppelType" />
+	<xsd:element ibmSchExtn:docRoot="true" name="SpConsultaVencidoBancoppelResponse" type="ns:SpConsultaVencidoBancoppelResponseType" />
+</xsd:schema>

@@ -1,0 +1,142 @@
+BROKER SCHEMA bancoppel.log
+
+CREATE COMPUTE MODULE ObtenerCabecera
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		SET OutputRoot = InputRoot;
+		SET Environment.trace.idTrxGlobal = InputRoot.SOAP.Body.*.cabecera.idTrxGlobal;
+		SET Environment.trace.sistemaOrigen = InputRoot.SOAP.Body.*.cabecera.sistemaOrigen;
+		SET Environment.operacion = InputLocalEnvironment.Destination.RouterList.DestinationData.labelName;
+		RETURN TRUE;
+	END;
+END MODULE;
+
+CREATE COMPUTE MODULE ObtenerCabeceraFormData
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		SET OutputRoot = InputRoot;
+		SET Environment.trace.idTrxGlobal = 'CuentaN2-012345678998765';
+		SET Environment.trace.sistemaOrigen = 'CuentaN2';
+		SET Environment.operacion = 'cliente_registro_alta-digital';
+		RETURN TRUE;
+	END;
+END MODULE;
+
+CREATE COMPUTE MODULE ObtenerCabeceraJSON
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		SET OutputRoot = InputRoot;
+		SET Environment.trace.idTrxGlobal = InputRoot.JSON.Data.cabecera.idTrxGlobal;
+		SET Environment.trace.sistemaOrigen = InputRoot.JSON.Data.cabecera.sistemaOrigen;
+		SET Environment.operacion = InputLocalEnvironment.REST.Input.Operation;
+		RETURN TRUE;
+	END;
+END MODULE;
+
+CREATE COMPUTE MODULE ObtenerCabeceraGET
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		SET Environment.trace.idTrxGlobal = InputLocalEnvironment.REST.Input.Parameters.idTrxGlobal;
+		SET Environment.trace.sistemaOrigen = InputLocalEnvironment.REST.Input.Parameters.sistemaOrigen;
+		SET Environment.operacion = InputLocalEnvironment.REST.Input.Operation;
+		RETURN TRUE;
+	END;
+END MODULE;
+
+CREATE COMPUTE MODULE ObtenerCabeceraIntCoppel
+	DECLARE ENDPOINT EXTERNAL CHARACTER;
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		SET OutputRoot = InputRoot;
+		SET Environment.trace.idTrxGlobal = InputRoot.SOAP.Body.*.cabecera.idTrxGlobal;
+		SET Environment.trace.sistemaOrigen = InputRoot.SOAP.Body.*.cabecera.sistemaOrigen;
+		SET Environment.operacion = InputLocalEnvironment.Destination.RouterList.DestinationData.labelName;
+		SET Environment.trace.trama = construirTramaWS(ENDPOINT, InputRoot.SOAP.Body);
+		RETURN TRUE;
+	END;
+END MODULE;
+
+CREATE COMPUTE MODULE ObtenerCabeceraChequesCentral
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		SET OutputRoot = InputRoot;
+		SET Environment.trace.idTrxGlobal = InputRoot.JSON.Data.cabecera.idTrxGlobal;
+		SET Environment.trace.sistemaOrigen = InputRoot.JSON.Data.cabecera.sistemaOrigen;
+		SET Environment.operacion = InputLocalEnvironment.REST.Input.Operation;
+		SET InputLocalEnvironment.Destination.File.Name = InputRoot.JSON.Data.nombre;
+		SET InputLocalEnvironment.nombre = InputRoot.JSON.Data.nombre;
+		SET InputLocalEnvironment.hash = InputRoot.JSON.Data.hash;		
+		RETURN TRUE;	
+	END;
+END MODULE;
+
+CREATE COMPUTE MODULE ObtenerCabeceraCheques
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		SET OutputRoot = InputRoot;
+		SET Environment.trace.idTrxGlobal = InputRoot.JSON.Data.cabecera.idTrxGlobal;
+		SET Environment.trace.sistemaOrigen = InputRoot.JSON.Data.cabecera.sistemaOrigen;
+		SET Environment.operacion = InputLocalEnvironment.REST.Input.Operation;
+		SET InputLocalEnvironment.Destination.File.Name = InputRoot.JSON.Data.nombre;
+		RETURN TRUE;
+	END;
+END MODULE;
+
+CREATE COMPUTE MODULE ObtenerCabeceraJSONAntad
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		SET OutputRoot = InputRoot;
+		SET Environment.trace.idTrxGlobal = InputRoot.JSON.Data.cabecera.idTrxGlobal;
+		SET Environment.trace.sistemaOrigen = InputRoot.JSON.Data.cabecera.sistemaOrigen;
+		SET Environment.operacion = InputLocalEnvironment.REST.Input.Operation;
+		SET Environment.ws = InputRoot.JSON.Data.ws;
+		RETURN TRUE;
+	END;
+END MODULE;
+
+CREATE COMPUTE MODULE ObtenerCabeceraJSONRubicon
+	DECLARE RENAPO EXTERNAL CHARACTER;
+	
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		SET OutputRoot = InputRoot;
+		SET Environment.trace.idTrxGlobal = InputRoot.JSON.Data.cabecera.idTrxGlobal;
+		SET Environment.trace.sistemaOrigen = InputRoot.JSON.Data.cabecera.sistemaOrigen;
+		SET Environment.operacion = InputLocalEnvironment.REST.Input.Operation;
+		SET Environment.renapo = RENAPO;
+		RETURN TRUE;
+	END;
+END MODULE;
+
+CREATE COMPUTE MODULE ObtenerCabeceraJSONHuellas442
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		SET OutputRoot = InputRoot;
+		SET Environment.trace.idTrxGlobal = InputRoot.JSON.Data.cabecera.idTrxGlobal;
+		SET Environment.trace.sistemaOrigen = InputRoot.JSON.Data.cabecera.sistemaOrigen;
+		SET Environment.operacion = InputLocalEnvironment.REST.Input.Operation;
+		SET Environment.idEmpleado = InputRoot.JSON.Data.idEmpleado;
+		SET Environment.sucursal = InputRoot.JSON.Data.sucursal;
+		SET Environment.ip = InputRoot.JSON.Data.ip;
+		SET Environment.mac = InputRoot.JSON.Data.mac;
+		SET Environment.operador = InputRoot.JSON.Data.operador;
+		SET Environment.idCliente = nvlTrim(InputRoot.JSON.Data.idCliente, '');
+		RETURN TRUE;
+	END;
+END MODULE;
+
+CREATE COMPUTE MODULE ObtenerCabeceraJSONAltaMovilValidaSession
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		SET OutputRoot = InputRoot;
+		SET Environment.trace.idTrxGlobal = InputRoot.JSON.Data.cabecera.idTrxGlobal;
+		SET Environment.trace.sistemaOrigen = InputRoot.JSON.Data.cabecera.sistemaOrigen;
+		SET Environment.seguridad.codigoTransaccion = InputRoot.JSON.Data.seguridad.codigoTransaccion;
+		SET Environment.seguridad.codigoAgente = InputRoot.JSON.Data.seguridad.codigoAgente;
+		SET Environment.seguridad.usuario = InputRoot.JSON.Data.seguridad.usuario;
+		SET Environment.seguridad.password = InputRoot.JSON.Data.seguridad.password;
+		SET Environment.seguridad.ipOrigen = InputRoot.JSON.Data.seguridad.ipOrigen;
+		SET Environment.seguridad.idSesion = InputRoot.JSON.Data.seguridad.idSesion;
+		RETURN TRUE;
+	END;
+END MODULE;
